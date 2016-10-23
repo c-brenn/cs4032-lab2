@@ -12,4 +12,13 @@ defmodule Rivet.SocketRegistry do
   def deregister_socket(pid) do
     Agent.update(@name, &Map.delete(&1, pid))
   end
+
+  def terminate_all_connections() do
+    Agent.get_and_update(@name, fn connections ->
+      connections
+      |> Map.values()
+      |> Enum.each(&:gen_tcp.close/1)
+      {:ok, %{}}
+    end)
+  end
 end

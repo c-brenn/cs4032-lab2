@@ -20,6 +20,7 @@ defmodule Rivet.Connection do
   defp serve(%Connection{status: :ok} = conn) do
     conn
     |> read_line()
+    |> determine_response()
     |> respond()
     |> serve()
   end
@@ -33,9 +34,18 @@ defmodule Rivet.Connection do
     %{conn | body: data, status: status}
   end
 
+  defp determine_response(%Connection{body: "KILL_SERVICE" <> _} = conn) do
+    %{conn | status: :terminate}
+  end
+  defp determine_response(conn), do: conn
+
   defp respond(%Connection{status: :ok} = conn) do
     response = conn.body <> @response_suffix
     :gen_tcp.send(conn.socket, response)
+    conn
+  end
+  defp respond(%Connection{status: :terminate} = conn) do
+    SocketRegistry.terminate_all_connections()
     conn
   end
   defp respond(conn), do: conn
