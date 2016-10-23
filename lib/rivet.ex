@@ -5,7 +5,7 @@ defmodule Rivet do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(Task, [Rivet.Listener, :init, []]),
+      worker(Task, [Rivet.Listener, :init, []], restart: :temporary),
       worker(Rivet.SocketRegistry, []),
       supervisor(Task.Supervisor, [[name: Rivet.Connection.Supervisor]])
     ]
