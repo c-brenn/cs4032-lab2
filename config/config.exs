@@ -2,6 +2,12 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
+{:ok, ifs} = :inet.getif()
+[{ip_parts, _, _} | _] = ifs
+ip = ip_parts |> Tuple.to_list() |> Enum.join(".")
+
+config :rivet, ip_address: ip
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,
