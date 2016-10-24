@@ -28,6 +28,9 @@ defmodule Rivet.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:edeliver, "~> 1.4.0"},
+      {:distillery, ">= 0.8.0", warn_missing: false}
+    ]
   end
 end

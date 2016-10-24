@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+APP="rivet"
+USING_DISTILLERY=true
+
+BUILD_HOST="nebula"
+BUILD_USER="root"
+BUILD_AT="/tmp/erlang/rivet/builds"
+
+PRODUCTION_HOSTS="nebula"
+PRODUCTION_USER="root"
+DELIVER_TO="/opt/rivet"

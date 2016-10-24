@@ -2,11 +2,7 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-{:ok, ifs} = :inet.getif()
-[{ip_parts, _, _} | _] = ifs
-ip = ip_parts |> Tuple.to_list() |> Enum.join(".")
-
-config :rivet, ip_address: ip
+config :rivet, ip_address: System.get_env("RIVET_IP_ADDRESS")
 config :rivet, port: 4000
 config :rivet, max_connections: 50
 

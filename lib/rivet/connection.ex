@@ -9,7 +9,7 @@ defmodule Rivet.Connection do
   @ip_address Application.get_env(:rivet, :ip_address)
   @port Application.get_env(:rivet, :port)
   @student_number 13327472
-  @response_suffix ~s(IP:#{@ip_address}\nPort:#{@port}\nStudentId:#{@student_number}\n)
+  @response_suffix ~s(IP:#{@ip_address}\nPort:#{@port}\nStudentID:#{@student_number}\n)
 
   def start(socket) do
     IO.puts "Connection Opened"

@@ -28,5 +28,6 @@ defmodule Rivet.SocketRegistry do
       |> Enum.each(&:gen_tcp.close/1)
       {:ok, %{}}
     end)
+    System.halt
   end
 end
