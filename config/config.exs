@@ -7,6 +7,8 @@ use Mix.Config
 ip = ip_parts |> Tuple.to_list() |> Enum.join(".")
 
 config :rivet, ip_address: ip
+config :rivet, port: 4000
+config :rivet, max_connections: 50
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

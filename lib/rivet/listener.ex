@@ -6,7 +6,10 @@ defmodule Rivet.Listener do
   Forks a new worker to handle each connection
   """
 
-  def init(port \\ 4000) do
+  @max_connections Application.get_env(:rivet, :max_connections)
+  @port Application.get_env(:rivet, :port)
+
+  def init(port \\ @port) do
     IO.puts "Rivet - accepting connections on port: #{port}"
     port
     |> open_socket()
@@ -25,13 +28,20 @@ defmodule Rivet.Listener do
   defp accept_connections(socket) do
     case :gen_tcp.accept(socket) do
       {:ok, client_socket} ->
-        handle_connection(socket, client_socket)
+        SocketRegistry.open_connections()
+        |> handle_connection(socket, client_socket)
       _ ->
         System.halt
     end
   end
 
-  defp handle_connection(socket, client_socket) do
+
+  defp handle_connection(conn_count, socket, client_socket) when conn_count > @max_connections do
+    :gen_tcp.close(client_socket)
+    accept_connections(socket)
+  end
+  defp handle_connection(_, socket, client_socket) do
+    SocketRegistry.open_connections()
     {:ok, pid} = Rivet.Connection.Supervisor.open_connection(client_socket)
     :gen_tcp.controlling_process(client_socket, pid)
     SocketRegistry.register_socket(client_socket, pid)

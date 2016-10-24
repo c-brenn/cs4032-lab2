@@ -7,7 +7,7 @@ defmodule Rivet.Connection do
   defstruct [:socket, :body, :status]
 
   @ip_address Application.get_env(:rivet, :ip_address)
-  @port 4000
+  @port Application.get_env(:rivet, :port)
   @student_number 13327472
   @response_suffix ~s(IP:#{@ip_address}\nPort:#{@port}\nStudentId:#{@student_number}\n)
 

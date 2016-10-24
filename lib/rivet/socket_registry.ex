@@ -5,6 +5,14 @@ defmodule Rivet.SocketRegistry do
     Agent.start_link(fn -> Map.new() end, name: @name)
   end
 
+  def open_connections() do
+    Agent.get(@name, fn state ->
+      state
+      |> Map.keys
+      |> Enum.count
+    end)
+  end
+
   def register_socket(socket, pid \\ self()) do
     Agent.update(@name, &Map.put(&1, pid, socket))
   end
