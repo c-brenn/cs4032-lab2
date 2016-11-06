@@ -1,5 +1,5 @@
 defmodule Rivet.Listener do
-  alias Rivet.SocketRegistry
+  alias Rivet.Connection
 
   @moduledoc """
   Accepts connections on a given port.
@@ -19,16 +19,16 @@ defmodule Rivet.Listener do
   defp open_socket(port) do
     {:ok, socket} = :gen_tcp.listen(
       port,
-      [:binary, packet: :line, active: false]
+      [:binary, packet: :raw]
     )
-    SocketRegistry.register_socket(socket)
+    Connection.Registry.register_listener(socket)
     socket
   end
 
   defp accept_connections(socket) do
     case :gen_tcp.accept(socket) do
       {:ok, client_socket} ->
-        SocketRegistry.open_connections()
+        Connection.Registry.connection_count()
         |> handle_connection(socket, client_socket)
       _ ->
         System.halt
@@ -41,10 +41,9 @@ defmodule Rivet.Listener do
     accept_connections(socket)
   end
   defp handle_connection(_, socket, client_socket) do
-    SocketRegistry.open_connections()
-    {:ok, pid} = Rivet.Connection.Supervisor.open_connection(client_socket)
+    {:ok, pid} = Connection.Supervisor.open_connection(client_socket)
     :gen_tcp.controlling_process(client_socket, pid)
-    SocketRegistry.register_socket(client_socket, pid)
+    Connection.Registry.register(client_socket, pid)
     accept_connections(socket)
   end
 end

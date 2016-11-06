@@ -1,52 +1,49 @@
 defmodule Rivet.Connection do
-  alias Rivet.{
-    Connection,
-    SocketRegistry
-  }
-
-  defstruct [:socket, :body, :status]
+  alias Rivet.Connection
+  use GenServer
 
   @ip_address Application.get_env(:rivet, :ip_address)
   @port Application.get_env(:rivet, :port)
   @student_number 13327472
   @response_suffix ~s(IP:#{@ip_address}\nPort:#{@port}\nStudentID:#{@student_number}\n)
 
-  def start(socket) do
+  def start_link(socket) do
+    GenServer.start_link(__MODULE__, socket)
+  end
+
+  def init(socket) do
     IO.puts "Connection Opened"
-    %Connection{socket: socket, status: :ok}
-    |> serve()
+    {:ok, socket}
   end
 
-  defp serve(%Connection{status: :ok} = conn) do
-    conn
-    |> read_line()
-    |> determine_response()
-    |> respond()
-    |> serve()
-  end
-  defp serve(_) do
-    SocketRegistry.deregister_socket(self())
-    IO.puts "Connection Closed"
+  def close_connection(pid) do
+    GenServer.cast(pid, :close_connection)
   end
 
-  defp read_line(conn) do
-    {status, data} = :gen_tcp.recv(conn.socket, 0)
-    %{conn | body: data, status: status}
+  def handle_info({:tcp, _, msg}, socket) do
+    handle_tcp(msg, socket)
+  end
+  def handle_info(_, socket), do: {:noreply, socket}
+
+  defp handle_tcp("HELO" <> _ = msg, socket) do
+    response = [msg, @response_suffix]
+    :gen_tcp.send(socket, response)
+    {:noreply, socket}
   end
 
-  defp determine_response(%Connection{body: "KILL_SERVICE" <> _} = conn) do
-    %{conn | status: :terminate}
+  defp handle_tcp("KILL_SERVICE" <> _, socket) do
+    Connection.Registry.terminate_open_connections()
+    {:noreply, socket}
   end
-  defp determine_response(conn), do: conn
 
-  defp respond(%Connection{status: :ok} = conn) do
-    response = conn.body <> @response_suffix
-    :gen_tcp.send(conn.socket, response)
-    conn
+  defp handle_tcp(_, socket), do: {:noreply, socket}
+
+  def handle_cast(:close_connection, socket) do
+    {:stop, {:shutdown, :close_connection}, socket}
   end
-  defp respond(%Connection{status: :terminate} = conn) do
-    SocketRegistry.terminate_all_connections()
-    conn
+
+  def terminate(:close_connection, socket) do
+    :gen_tcp.close(socket)
+    Connection.Registry.deregister()
   end
-  defp respond(conn), do: conn
 end

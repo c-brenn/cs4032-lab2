@@ -6,8 +6,8 @@ defmodule Rivet do
 
     children = [
       worker(Task, [Rivet.Listener, :init, []], restart: :temporary),
-      worker(Rivet.SocketRegistry, []),
-      supervisor(Task.Supervisor, [[name: Rivet.Connection.Supervisor]])
+      worker(Rivet.Connection.Registry, []),
+      supervisor(Rivet.Connection.Supervisor, [])
     ]
 
     opts = [strategy: :one_for_one, name: Rivet.Supervisor]
