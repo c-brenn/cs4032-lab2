@@ -1,24 +1,29 @@
 # Rivet
 
-**TODO: Add description**
+TCP server implementing the protocol for Lab 2.
 
-## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+## Dependencies
 
-  1. Add `rivet` to your list of dependencies in `mix.exs`:
+This project is built using [elixir](http://www.elixir-lang.org).
+Follow the installation guides on [their site](http://www.elixir-lang.org/install.html)
 
-    ```elixir
-    def deps do
-      [{:rivet, "~> 0.1.0"}]
-    end
-    ```
+## Compilation
 
-  2. Ensure `rivet` is started before your application:
+With elixir installed, you can compile the project using `compile.sh`
 
-    ```elixir
-    def application do
-      [applications: [:rivet]]
-    end
-    ```
+```bash
+$ ./compile.sh [port] [ip address]
+```
 
+The port to listen on and the IP address to return in each message can be
+specified at compile time. They default to `4000` and `127.0.0.1` respectively.
+
+
+## Run
+
+Once the project has been compiled, you can run it using `run.sh`
+
+```bash
+$ ./run.sh
+```
